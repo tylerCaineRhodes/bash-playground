@@ -1,0 +1,13 @@
+#! /usr/local/bin/bash
+
+# in order to run a script from your current shell, you must run it with the
+# source command. This is commonly done with an alias. For example: alias back='source back'
+
+# echo -e "\nalias back='source back'" >> ~/.zshrc && source ~/.zshrc
+
+max="$1";
+
+for (( i = 0; i < $max; i = i+1 )); do
+  cd ..
+done
+
