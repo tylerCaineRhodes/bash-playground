@@ -1,0 +1,86 @@
+#! /usr/local/bin/bash
+
+divider="#***************************"
+
+function appendtobottom() {
+  local filetochange=$1
+  local datatopush=$2
+
+  echo -e "\n" >> "$filetochange"
+  echo $divider >> "$filetochange"
+  echo "${datatopush}" >> "$filetochange"
+  echo $divider >> "$filetochange"
+}
+
+function appendtotop() {
+  local filetochange=$1
+  local newfiletext=$(cat $filetochange)
+  local datatounshift=$2
+
+  echo "${divider}
+  ${datatounshift}
+  ${divider}
+  ${newfiletext}" > "$filetochange"
+}
+
+function getfile() {
+  local word=$1
+  local file=$2
+
+  output=$(grep -i -n $word $file)
+  basefilename=$(basename $file)
+
+  if [[ $output ]]; then
+    echo "FOUND!";
+    newfile="${storagedir}/${basefilename}"
+    cp "$file" "$newfile"
+
+    "appendto${printposition}" "$newfile" "$output"
+  fi
+}
+
+function assignuserinput() {
+  wordtocheck=$1
+  foldertocheck=$2
+
+  read -p "Please name the directory for storing matching files: " storagedir
+
+  printposition=""
+  while [ "$printposition" != "top" -a "$printposition" != "bottom" ];
+  do
+    read -p "append hits to top or bottom of file? " printposition
+    if [ "$printposition" != "top" -a "$printposition" != "bottom" ]; then
+      echo "You typed '${printposition}'"
+      echo "You must type either 'top' or 'bottom'"
+    fi
+  done
+}
+
+########## Main ###########
+assignuserinput $1 $2
+
+if [ -s "$foldertocheck" ]; then
+  cd $foldertocheck
+fi
+
+mkdir "$storagedir"
+
+directories=$(find . -type d)
+
+for directory in $directories;
+do
+  if [ "$directory" == "./${storagedir}" ]; then
+    echo "Skipping new '${storagedir}' directory"
+    continue
+  fi
+
+  for file in $directory/*;
+  do
+    if [ -f "$file" ]; then
+      getfile $wordtocheck $file
+    fi
+  done
+  echo "__________________"
+  echo " "
+done
+########## Main ###########

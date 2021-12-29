@@ -1,0 +1,27 @@
+#! /usr/local/bin/bash
+
+read -p "Filename: " filename
+
+bashpath=$(which bash)
+
+newfile="${filename}.sh"
+
+cd "${HOME}/projects/bashdir"
+
+if [ -f ${newfile} ];then
+  echo "File already exists!"
+  exit
+fi
+
+touch $newfile
+
+chmod +x $newfile
+echo $newfile
+
+echo -e "#! ${bashpath}\n" >> $newfile
+
+# cat << EOF >> $newfile
+# #! ${bashpath}
+# EOF
+
+echo "Done!"

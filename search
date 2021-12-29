@@ -1,0 +1,55 @@
+#! /usr/local/bin/bash
+
+divider="#***************************"
+
+function appendtobottom() {
+  local filetochange=$1
+  local datatopush=$2
+
+  echo -e "\n" >> "$filetochange"
+  echo $divider >> "$filetochange"
+  echo "${datatopush}" >> "$filetochange"
+  echo $divider >> "$filetochange"
+}
+
+function appendtotop() {
+  local filetochange=$1
+  local newfiletext=$(cat $filetochange)
+  local datatounshift=$2
+
+  echo "${divider}
+  ${datatounshift}
+  ${divider}
+  ${newfiletext}" > "$filetochange"
+}
+
+echo "Please name the directory for storing matching files: "
+read dirname
+
+read -p "append hits to top or bottom of file? " position
+
+word=$1
+folder=$2
+
+cd $folder
+
+mkdir "$dirname"
+
+for file in *
+do
+  if [ -f "$file" ]; then
+    output=$(grep -i -n $word $file)
+
+    if [[ $output ]]; then
+      echo "FOUND!";
+      cp "$file" "$dirname"
+
+      newfile="${dirname}/${file}"
+
+      "appendto${position}" "$newfile" "$output"
+    fi
+  else
+    echo "$file is not a file"
+  fi
+  echo "_____________________"
+done

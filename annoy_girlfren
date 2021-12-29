@@ -1,0 +1,18 @@
+#!/bin/bash
+
+annoy(){
+  local voice=$1
+  local dir=$2
+
+  for p in $dir/*                                                                                                                voice30 ↵ tylerrhodes@Tylers-MBP
+    do
+      echo $p; say -v $voice -r $((voice0 + $RANDOM % 500)) "$p";
+        if [ -d $p ]
+          then
+          annoy $voice $p
+        fi
+    done
+}
+
+annoy $1 $2
+
