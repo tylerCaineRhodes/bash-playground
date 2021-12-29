@@ -1,12 +1,18 @@
 #! /usr/local/bin/bash
 
+######## modern for-loop with numbers ########
+
+for ((i = 0; i < 25; i=i+1)); do
+  echo "$i"
+done
+
+# temporary end of file
+
 for i in {0..6}
 do
   echo "number:   $i"
   sleep 3
 done
-
-# temporary end of file
 exit
 
 number=1
