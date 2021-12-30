@@ -1,0 +1,14 @@
+#! /usr/local/bin/bash
+
+if [ "$1" == "-p" ]; then
+  precision=$2
+  # don't send the first two vars to the bc command
+  shift 2
+else
+  precision=3
+fi
+
+bc << EOF
+scale=$precision
+$@
+EOF
