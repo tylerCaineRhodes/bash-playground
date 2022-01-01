@@ -1,0 +1,36 @@
+#! /usr/local/bin/bash
+
+OLD_IFS="$IFS"
+IFS=":"
+
+if [ "$1" == "-d" ]; then
+  directory="$2"
+  for dir in $PATH;
+  do
+    if [ "$directory" == "$dir" -o "$directory" == "$dir/" ]; then
+      echo "FOUND"
+    fi
+  done
+  exit
+fi
+
+# Check if a command is present
+if [ "$1" == "-c" ]; then
+  command="$2"
+
+  for dir in $PATH;
+  do
+    if [ -e "${dir}/${command}" ]; then
+      echo "***COMMAND PRESENT IN PATH***"
+      echo $dir/$command
+    fi
+  done
+  exit
+fi
+
+for dir in $PATH;
+do
+  echo "$dir"
+done
+
+IFS="$OLD_IFS"
