@@ -1,0 +1,29 @@
+#! /usr/local/bin/bash
+
+readonly FILE="$1"
+
+if [ ! -r "$FILE" ]; then
+  echo "File not readable"
+  exit
+fi
+
+max_length=0
+max_word=''
+
+readonly strings_from_file=$(strings "$FILE")
+
+for string in $strings_from_file
+do
+  # length=$(echo "$string" | wc -c)
+  # length=$((length - 1))
+  length=${#string}
+
+  if [ $length -gt $max_length ]; then
+    max_length=$length
+    max_word=$string
+  fi
+done
+
+echo "Max length of word is $max_length"
+echo "Longest word is $max_word"
+
