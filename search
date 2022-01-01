@@ -2,25 +2,25 @@
 
 divider="#***************************"
 
-function appendtobottom() {
-  local filetochange=$1
-  local datatopush=$2
+function append_to_bottom() {
+  local file_to_change=$1
+  local data_to_push=$2
 
-  echo -e "\n" >> "$filetochange"
-  echo $divider >> "$filetochange"
-  echo "${datatopush}" >> "$filetochange"
-  echo $divider >> "$filetochange"
+  echo -e "\n" >> "$file_to_change"
+  echo $divider >> "$file_to_change"
+  echo "${data_to_push}" >> "$file_to_change"
+  echo $divider >> "$file_to_change"
 }
 
-function appendtotop() {
-  local filetochange=$1
-  local newfiletext=$(cat $filetochange)
-  local datatounshift=$2
+function append_to_top() {
+  local file_to_change=$1
+  local new_file_text=$(cat $file_to_change)
+  local data_to_unshift=$2
 
   echo "${divider}
-  ${datatounshift}
+  ${data_to_unshift}
   ${divider}
-  ${newfiletext}" > "$filetochange"
+  ${new_file_text}" > "$file_to_change"
 }
 
 echo "Please name the directory for storing matching files: "
@@ -46,7 +46,7 @@ do
 
       newfile="${dirname}/${file}"
 
-      "appendto${position}" "$newfile" "$output"
+      "append_to_${position}" "$newfile" "$output"
     fi
   else
     echo "$file is not a file"

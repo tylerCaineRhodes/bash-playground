@@ -1,27 +1,27 @@
 #! /usr/local/bin/bash
 
-read -p "Filename: " filename
+read -p "Filename: " file_name
 
-bashpath=$(which bash)
+bash_path=$(which bash)
 
-newfile="${filename}"
+new_file="${file_name}"
 
 cd "${HOME}/projects/bashdir"
 
-if [ -f ${newfile} ];then
+if [ -f ${new_file} ];then
   echo "File already exists!"
   exit
 fi
 
-touch $newfile
+touch $new_file
 
-chmod +x $newfile
-echo $newfile
+chmod +x $new_file
+echo $new_file
 
-echo -e "#! ${bashpath}\n" >> $newfile
+echo -e "#! ${bash_path}\n" >> $new_file
 
-# cat << EOF >> $newfile
-# #! ${bashpath}
+# cat << EOF >> $new_file
+# #! ${bash_path}
 # EOF
 
 echo "Done!"

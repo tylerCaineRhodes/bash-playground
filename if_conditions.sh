@@ -13,20 +13,20 @@
 # !              not
 read -p "dive me a filename " myfile
 
-if [ -e "$myfile" ]; then
+if [ -e "$my_file" ]; then
   echo "the file exists "
 fi
 
-if [ -d "$myfile" ]; then
+if [ -d "$my_file" ]; then
   echo "the file exists and is a directory "
 fi
 
 # regular file ( not directory, not link, etc..)
-if [ -f "$myfile" ]; then
+if [ -f "$my_file" ]; then
   echo "this file exists and is a regular file"
 fi
 
-if [ -s "$myfile" ]; then
+if [ -s "$my_file" ]; then
   echo "this file exists and has a length > 0"
 fi
 ########## Files ##########

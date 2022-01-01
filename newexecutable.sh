@@ -1,12 +1,12 @@
 #! /usr/local/bin/bash
 
-read -p "name of file: " filename
+read -p "name of file: " file_name
 
-touch ${filename}
+touch ${file_name}
 
-echo "#! /usr/local/bin/bash" >> ${filename}
-echo "############## Automatically Created Script ##########" >> ${filename}
+echo "#! /usr/local/bin/bash" >> ${file_name}
+echo "############## Automatically Created Script ##########" >> ${file_name}
 
-chmod +x ${filename}
+chmod +x ${file_name}
 
 echo "Done"

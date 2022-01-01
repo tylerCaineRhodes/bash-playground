@@ -1,7 +1,7 @@
 #! /usr/local/bin/bash
 
 
-myfunction() {
+my_function() {
   local var1="eggs"
 
 # variables are global by default
@@ -10,7 +10,7 @@ myfunction() {
   echo "my variable inside the function is: $var1"
 }
 
-myfunction
+my_function
 
 echo "Outside: $var1"
 echo "Outside: $var2"
@@ -19,21 +19,21 @@ echo "Outside: $var2"
 
 exit
 
-mydate() {
+my_date() {
   echo "today is: "
   date
   echo "have a greate day!"
   return 16
 }
 
-hello2() {
+hello_2() {
   echo "hello $1"
   echo "hello also, to $2"
   return 35
 }
 
-mydate
+my_date
 echo "return value of my first function is $?"
 
-hello2 "Tyler" "blahblahblah"
+hello_2 "Tyler" "blahblahblah"
 echo "return value of my second function is $?"

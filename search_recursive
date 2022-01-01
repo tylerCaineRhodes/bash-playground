@@ -2,82 +2,82 @@
 
 divider="#***************************"
 
-function appendtobottom() {
-  local filetochange=$1
-  local datatopush=$2
+function append_to_bottom() {
+  local file_to_change=$1
+  local data_to_push=$2
 
-  echo -e "\n" >> "$filetochange"
-  echo $divider >> "$filetochange"
-  echo "${datatopush}" >> "$filetochange"
-  echo $divider >> "$filetochange"
+  echo -e "\n" >> "$file_to_change"
+  echo $divider >> "$file_to_change"
+  echo "${data_to_push}" >> "$file_to_change"
+  echo $divider >> "$file_to_change"
 }
 
-function appendtotop() {
-  local filetochange=$1
-  local newfiletext=$(cat $filetochange)
-  local datatounshift=$2
+function append_to_top() {
+  local file_to_change=$1
+  local new_file_text=$(cat $file_to_change)
+  local data_to_unshift=$2
 
   echo "${divider}
-  ${datatounshift}
+  ${data_to_unshift}
   ${divider}
-  ${newfiletext}" > "$filetochange"
+  ${new_file_text}" > "$file_to_change"
 }
 
-function getfile() {
+function get_file() {
   local word=$1
   local file=$2
 
   output=$(grep -i -n $word $file)
-  basefilename=$(basename $file)
+  base_file_name=$(basename $file)
 
   if [[ $output ]]; then
     echo "FOUND!";
-    newfile="${storagedir}/${basefilename}"
-    cp "$file" "$newfile"
+    new_file="${storage_dir}/${base_file_name}"
+    cp "$file" "$new_file"
 
-    "appendto${printposition}" "$newfile" "$output"
+    "append_to_${print_position}" "$new_file" "$output"
   fi
 }
 
-function assignuserinput() {
-  wordtocheck=$1
-  foldertocheck=$2
+function assign_user_input() {
+  word_to_check=$1
+  folder_to_check=$2
 
-  read -p "Please name the directory for storing matching files: " storagedir
+  read -p "Please name the directory for storing matching files: " storage_dir
 
-  printposition=""
-  while [ "$printposition" != "top" -a "$printposition" != "bottom" ];
+  print_position=""
+  while [ "$print_position" != "top" -a "$print_position" != "bottom" ];
   do
-    read -p "append hits to top or bottom of file? " printposition
-    if [ "$printposition" != "top" -a "$printposition" != "bottom" ]; then
-      echo "You typed '${printposition}'"
+    read -p "append hits to top or bottom of file? " print_position
+    if [ "$print_position" != "top" -a "$print_position" != "bottom" ]; then
+      echo "You typed '${print_position}'"
       echo "You must type either 'top' or 'bottom'"
     fi
   done
 }
 
 ########## Main ###########
-assignuserinput $1 $2
+assign_user_input $1 $2
 
-if [ -s "$foldertocheck" ]; then
-  cd $foldertocheck
+if [ -s "$folder_to_check" ]; then
+  cd $folder_to_check
 fi
 
-mkdir "$storagedir"
+mkdir "$storage_dir"
 
 directories=$(find . -type d)
 
 for directory in $directories;
 do
-  if [ "$directory" == "./${storagedir}" ]; then
-    echo "Skipping new '${storagedir}' directory"
+  if [ "$directory" == "./${storage_dir}" ]; then
+    echo "Skipping new '${storage_dir}' directory"
     continue
   fi
 
   for file in $directory/*;
   do
     if [ -f "$file" ]; then
-      getfile $wordtocheck $file
+      get_file $word_to_check $file
     fi
   done
   echo "__________________"

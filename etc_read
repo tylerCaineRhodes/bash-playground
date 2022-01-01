@@ -1,11 +1,11 @@
 #! /usr/local/bin/bash
 
-file=/etc/passwd
+readonly FILE=/etc/passwd
 read -p "Enter name of the username: " username
 
-resultstring=$(grep $username $file)
+result_string=$(grep $username $FILE)
 
-if [ -z "$resultstring" ]; then
+if [ -z "$result_string" ]; then
   echo "User not found"
   exit
 fi
@@ -13,7 +13,7 @@ fi
 OLD_IFS=$IFS
 IFS=":"
 
-read user pass uid gid name dir shell <<< "$resultstring"
+read user pass uid gid name dir shell <<< "$result_string"
 
 echo "user is:       $user"
 echo "pass is:       $pass"

@@ -12,46 +12,46 @@ function divisible() {
   done
 }
 
-function isdivisible() {
-  truecount=0
+function is_divisible() {
+  true_count=0
 
   if [ $(($1 % 2)) -eq 0 ]; then
     echo "$1 is divisible by 2!"
-    truecount=$(( truecount+=1 ))
+    true_count=$(( true_count+=1 ))
   fi
 
   if [ $(($1 % 3)) -eq 0 ]; then
     echo "$1 is divisible by 3!"
-    truecount=$(( truecount+=1 ))
+    true_count=$(( true_count+=1 ))
   fi
 
   if [ $(($1 % 5)) -eq 0 ]; then
     echo "$1 is divisible by 5!"
-    truecount=$(( truecount+=1 ))
+    true_count=$(( true_count+=1 ))
   fi
 
-  if [ $truecount -eq 0 ]; then
+  if [ $true_count -eq 0 ]; then
     echo "$1 is not divisible by 2, 3, or 5"
   fi
 }
 
-function isbetterdivisible() {
-  wasdivided=1
+function is_better_divisible() {
+  was_divided=1
 
   for divider in {2,3,5}
   do
     local remainder=$(( $1 % $divider ))
     if [ $remainder -eq 0 ]; then
       echo "$1 is divisible by $divider"
-      wasdivided=0
+      was_divided=0
     fi
   done
 
-  if [ $wasdivided -eq 1 ]; then
+  if [ $was_divided -eq 1 ]; then
     echo "$1 is not divisible by 2, 3, or 5"
-    return $wasdivided
+    return $was_divided
   else
-    return $wasdivided
+    return $was_divided
   fi
 }
 

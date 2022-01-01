@@ -1,14 +1,14 @@
 #! /usr/local/bin/bash
 
-read -p "what is your name? " yourname
+read -p "what is your name? " your_name
 
-echo "hello $yourname"
+echo "hello $your_name"
 
 echo "tell me the path of the file you want to open"
 
-read filepath
+read file_path
 
-open $filepath
+open $file_path
 
 echo ------------------*
 
