@@ -1,0 +1,30 @@
+#! /usr/local/bin/bash
+readonly SOMEFILE=arrays.sh
+
+# filename
+stat -f %N $SOMEFILE
+
+# permissions
+stat -f %p $SOMEFILE
+
+# permissions that are actually human readable
+stat -f %Sp $SOMEFILE
+
+# user
+stat -f %u $SOMEFILE
+stat -f %Su $SOMEFILE
+
+# group
+stat -f %g $SOMEFILE
+stat -f %Sg $SOMEFILE
+
+#size
+stat -f %z $SOMEFILE
+
+#last time of access
+stat -f %a $SOMEFILE
+stat -f %Sa $SOMEFILE
+
+#last time of change
+stat -f %c $SOMEFILE
+stat -f %Sc $SOMEFILE

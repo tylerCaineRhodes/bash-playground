@@ -17,6 +17,8 @@ echo "day 3 after reassignment: ${days[3]}"
 for i in {0..4}
 do
   echo ${days[$i]}
+  # seems to be the same as...
+  # echo ${days[i]}
 done
 
 
