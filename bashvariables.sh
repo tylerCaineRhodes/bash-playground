@@ -5,6 +5,7 @@ echo " this is the number of parameters passed to the program: $#"
 echo " this is the current exit code: $?"
 echo "this is the exact path of the script: $0"
 echo "this is the internal field seperator: ---> $IFS <---"
+# Unassign variables with `unset`
 
 echo "all parameters: $@"
 echo "all parameters: $*"
