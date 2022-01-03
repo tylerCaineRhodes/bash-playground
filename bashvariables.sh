@@ -1,5 +1,8 @@
 #! /usr/local/bin/bash
 
+# identify the operating system
+echo $OSTYPE
+
 echo "double digit arguments must be specified this way: ${12}"
 echo " this is the number of parameters passed to the program: $#"
 echo " this is the current exit code: $?"
