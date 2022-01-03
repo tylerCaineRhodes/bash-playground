@@ -17,6 +17,10 @@ echo "variable is $number1"
 echo "$(( number1++ ))"
 echo "variable is $number1"
 
+# another way to calculate and assign a variable
+(( platypus = 1 + 1 ))
+echo $platypus
+
 
 echo "increase the value before printing"
 echo "variable is $number1"
