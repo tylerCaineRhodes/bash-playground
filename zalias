@@ -1,0 +1,7 @@
+#! /usr/local/bin/bash
+
+alias_to_add="$1"
+
+echo -e "\nalias ${alias_to_add}" >> ~/.zshrc
+echo "Added `${alias_to_add}` to your $HOME/.zshrc file! Run source to update your shell!"
+
