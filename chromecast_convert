@@ -9,7 +9,6 @@ mkdir -p $new_dir
 files=$(ls -p | grep -v / | grep "${input_type}$")
 
 for file in $files; do
-  # conventional ffmpeg -i "$file" -codec copy "output.mp4" doesn't copy over subtitles
   ffmpeg -i "$file" -c copy -c:s mov_text "${new_dir}/${file%.*}.${output_type}" 
 
   if [ $? -ne 0 ]; then
