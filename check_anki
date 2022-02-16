@@ -1,0 +1,9 @@
+#! /usr/local/bin/bash
+
+anki_dirs=(~/anki_downloads ~/anki_csv)
+
+for dir in ${anki_dirs[@]}; do
+  echo $dir; cd $dir; ls;
+  echo "-----------------------------------------------------"
+done
+
