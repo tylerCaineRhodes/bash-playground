@@ -77,3 +77,16 @@ echo "e is $e"
 IFS=$OLD_IFS
 
 ########################
+# ESCAPING OUTPUT
+
+# throwing away stdout
+> /dev/null
+
+# throwing away stdout
+1> /dev/null
+
+# throwing away stderr
+2> /dev/null
+
+# throwing away stdout and stderr
+&> /dev/null
