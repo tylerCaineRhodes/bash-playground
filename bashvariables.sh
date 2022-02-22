@@ -90,3 +90,12 @@ IFS=$OLD_IFS
 
 # throwing away stdout and stderr
 &> /dev/null
+
+
+# getting filename without the extension
+${filename%.*}
+
+# getting extension of the file
+${filename%.*}
+# or
+basename -s .mkv $filename
