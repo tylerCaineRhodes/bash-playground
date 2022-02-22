@@ -1,0 +1,7 @@
+#! /usr/local/bin/bash
+
+readonly file=$1
+readonly extension=${file##*.}
+readonly file_without_extension=$(basename -s ".${extension}" $file)
+
+ffmpeg -i "$file" -map 0:s:0 "$file_without_extension".srt
