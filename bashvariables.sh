@@ -1,4 +1,4 @@
-#! /usr/local/bin/bash
+#! /bin/bash
 
 # identify the operating system
 echo $OSTYPE

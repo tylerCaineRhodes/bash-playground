@@ -1,4 +1,4 @@
-#! /usr/local/bin/bash
+#! /bin/bash
 
 # in order to run a script from your current shell, you must run it with the
 # source command. This is commonly done with an alias. For example: alias back='source back'

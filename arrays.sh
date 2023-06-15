@@ -1,4 +1,4 @@
-#! /usr/local/bin/bash
+#! /bin/bash
 
 a[0]="ball"
 a[1]="one glass"

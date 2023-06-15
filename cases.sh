@@ -1,4 +1,4 @@
-#! /usr/local/bin/bash
+#! /bin/bash
 
 # exit status -- $? ex: echo $?  (0 is good, 1 is bad)
 

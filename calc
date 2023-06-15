@@ -1,4 +1,4 @@
-#! /usr/local/bin/bash
+#! /bin/bash
 
 if [ "$1" == "-p" ]; then
   precision=$2

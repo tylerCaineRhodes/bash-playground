@@ -1,4 +1,4 @@
-#! /usr/local/bin/bash
+#! /bin/bash
 
 anki_dirs=(~/anki_downloads ~/anki_csv)
 

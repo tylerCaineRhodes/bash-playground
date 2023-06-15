@@ -1,4 +1,4 @@
-#! /usr/local/bin/bash
+#! /bin/bash
 
 ##### HERE DOCUMENT #####
 # EOF can be literally anything, denoting the end of the file

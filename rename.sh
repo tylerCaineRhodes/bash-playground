@@ -1,4 +1,4 @@
-#! /usr/local/bin/bash
+#! /bin/bash
 
 type=""
 while [ "$type" != "t" -a "$type" != "j" ]

@@ -1,9 +1,14 @@
-#! /usr/local/bin/bash
+#! /bin/bash
 
 readonly FILE=/etc/passwd
 read -p "Enter name of the username: " username
 
 result_string=$(grep $username $FILE)
+# can also use this:
+# result_string=`grep $username $FILE`
+# the former is prefered because you can nest it:
+# result_string=$(grep $username $(ls /etc/*passwd*))
+
 
 if [ -z "$result_string" ]; then
   echo "User not found"

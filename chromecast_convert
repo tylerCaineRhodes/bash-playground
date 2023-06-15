@@ -1,4 +1,12 @@
-#! /usr/local/bin/bash
+#! /bin/bash
+
+read -p "Are you in the directory with the files you want to convert? (y/n): " answer
+if [ "$answer" != "y" ]; then
+  echo "Please cd into the directory with the files you want to convert."
+  exit 1
+else
+  echo "Great! Let's get started."
+fi
 
 read -p "input file type (mkv, mp4, etc...): " input_type
 read -p "output file type (default for chromecast is mp4...): " output_type

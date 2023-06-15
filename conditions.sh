@@ -1,4 +1,4 @@
-#! /usr/local/bin/bash
+#! /bin/bash
 
 read -p "Type an integer between 1 and 4 " num
 
