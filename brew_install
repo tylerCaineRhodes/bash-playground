@@ -1,0 +1,25 @@
+#! /opt/homebrew/bin/bash
+
+packages=(
+  "tmux"
+  "nvm"
+  "rbenv"
+  "tldr"
+  "postgresql@14"
+  "elixir"
+  "ffmpeg"
+  "imagemagick"
+  "heroku"
+  "neovim"
+)
+
+brew update
+
+for pkg in "${packages[@]}"; do
+  if brew list -1 | grep -q "^${pkg}\$"; then
+    echo "Package '$pkg' is already installed"
+  else
+    echo "Installing package '$pkg'"
+    brew install $pkg
+  fi
+done
