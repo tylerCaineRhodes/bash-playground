@@ -1,25 +1,33 @@
-#! /opt/homebrew/bin/bash
+#! /usr/bin/env bash
 
 packages=(
-  "tmux"
-  "nvm"
-  "rbenv"
-  "tldr"
-  "postgresql@14"
-  "elixir"
-  "ffmpeg"
-  "imagemagick"
-  "heroku"
-  "neovim"
+	"tmux"
+	"nvm"
+	"rbenv"
+	"tldr"
+	"elixir"
+	"ffmpeg"
+	"imagemagick"
+	"heroku"
+	"neovim"
+	"rubymine"
+	"yarn"
+	"cmake"
+	"shared-mime-info"
+	"vips"
+	"redis"
+	"elasticsearch"
+	"chromedriver"
+	"openssl@3"
 )
 
 brew update
 
 for pkg in "${packages[@]}"; do
-  if brew list -1 | grep -q "^${pkg}\$"; then
-    echo "Package '$pkg' is already installed"
-  else
-    echo "Installing package '$pkg'"
-    brew install $pkg
-  fi
+	if brew list -1 | grep -q "^${pkg}\$"; then
+		echo "Package '$pkg' is already installed"
+	else
+		echo "Installing package '$pkg'"
+		brew install $pkg
+	fi
 done
