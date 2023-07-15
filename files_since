@@ -1,0 +1,6 @@
+#! /opt/homebrew/bin/bash
+
+from_commit=$1
+to_commit=${2:-HEAD}
+
+git diff --name-only $from_commit $to_commit

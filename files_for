@@ -1,0 +1,4 @@
+#! /opt/homebrew/bin/bash
+
+target_commit=${1:-HEAD}
+git diff-tree --no-commit-id --name-only -r $target_commit

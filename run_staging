@@ -3,5 +3,4 @@
 pushd ~/projects/war-of-the-worlds
 
 ACTIVE_JOB_QUEUE_ADAPTER=resque;ACTIVE_STORAGE_USE_PROD_AS_REVERSE_MIRROR=true;FF_AUTH0=true;FF_NETWORK_INSIGHTS=true;FF_OFFERS_HOST_READ_FILTER=true;RACK_TIMEOUT_SERVICE_TIMEOUT=false;SCOUT_SAMPLE_RATE=1
-
-bundle exec foreman start -f Procfile.dev
+bundle exec foreman start -c -e development.env.json -f Procfile.dev

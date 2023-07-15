@@ -1,12 +1,13 @@
 #! /bin/bash
 
+BASH_SCRIPTS="${HOME}/projects/bashdir"
+
 read -p "Filename: " file_name
 
 bash_path=$(which bash)
 
 new_file="${file_name}"
 
-readonly BASH_SCRIPTS = "${HOME}/projects/bashdir"
 mkdir -p $BASH_SCRIPTS
 
 cd $BASH_SCRIPTS
