@@ -1,0 +1,15 @@
+#! /opt/homebrew/bin/bash
+
+file=$1
+interval=${2:-5}
+
+if [ -z "$file" ]; then
+  echo "Please provide a file to monitor the size of..."
+  exit 1
+fi
+
+while true; do
+ current_size=$(ls -lah $file | awk '{print $5}')
+ echo "file size: $current_size"
+ sleep "$interval" > /dev/null;
+done
