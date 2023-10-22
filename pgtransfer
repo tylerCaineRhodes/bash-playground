@@ -1,0 +1,36 @@
+#! /opt/homebrew/bin/bash
+
+read -p "Please enter the URL of the database you want to copy: " DATABASE_TO_COPY_URL
+if [ -z "$DATABASE_TO_COPY_URL" ]; then
+  echo "Error: DATABASE_TO_COPY_URL is required."
+  exit 1
+fi
+
+read -p "Please enter the local URL of the database you want to copy to: " LOCAL_URL
+if [ -z "$LOCAL_URL" ]; then
+  echo "Error: LOCAL_URL is required."
+  exit 1
+fi
+
+read -p "Please enter the directory you want to dump to: " DUMPDIR
+if [ -z "$DUMPDIR" ]; then
+  echo "Error: DUMPDIR is required."
+  exit 1
+fi
+
+read -p "Optionally enter the tables/patterns you want to ignore (separated by spaces) or press Enter to continue: " IGNORED_TABLES
+
+######## Main ##########
+pgcopy $DATABASE_TO_COPY_URL $DUMPDIR $IGNORED_TABLES
+
+if [ $? -ne 0 ]; then
+echo 'did not dump successfully'
+  exit 1
+fi
+
+pgrestore $LOCAL_URL $DUMPDIR
+
+if [ $? -ne 0 ]; then
+  exit 1
+fi
+######## Main ##########
