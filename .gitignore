@@ -1,0 +1,4 @@
+# internal scripts
+ch*
+pg:copy*
+pg:restore*
