@@ -19,6 +19,9 @@ packages=(
 	"elasticsearch"
 	"chromedriver"
 	"openssl@3"
+	"bat"
+	"tmuxinator"
+	"watch"
 )
 
 brew update
