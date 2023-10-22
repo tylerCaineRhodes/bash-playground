@@ -1,0 +1,6 @@
+#! /opt/homebrew/bin/bash
+
+read -p "Enter the path to the directory you want to compress: " DIRECTORY
+
+FILE_NAME=$(basename $DIRECTORY)
+tar -czvf ${FILE_NAME}.tar.gz -C $DIRECTORY .
