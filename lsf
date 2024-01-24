@@ -1,2 +1,9 @@
 #! /bin/bash
-ls -p | grep -v / 2> /dev/null
+
+flags=$1
+
+if [ -z "$flags" ]; then
+  ls -p | grep -v / 2> /dev/null
+else
+  ls -p "$flags" | grep -v / 2> /dev/null
+fi
