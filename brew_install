@@ -22,6 +22,9 @@ packages=(
 	"bat"
 	"tmuxinator"
 	"watch"
+	"tree"
+  "ripgrep"
+  "fd"
 )
 
 brew update
