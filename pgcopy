@@ -23,7 +23,9 @@ function dump_gracefully() {
     ignored_table_str+=" -T \"$table\""
   done
 
-  pg_dump $DATABASE_TO_COPY_URL -j 4 -Fd -v -b $ignored_table_str --no-acl --no-owner -f $DUMPDIR
+  workers=4
+
+  pg_dump $DATABASE_TO_COPY_URL -j $workers -Fd -v -b $ignored_table_str --no-acl --no-owner -f $DUMPDIR
 
   if [ $? -ne 0 ]; then
     echo "Error: pg_dump failed."

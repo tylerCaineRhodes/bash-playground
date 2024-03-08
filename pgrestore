@@ -14,7 +14,7 @@ fi
 function restore_gracefully() {
   echo "Starting restore with $DUMPDIR..."
 
-  pg_restore -d $LOCAL_URL -j 4 --disable-triggers --no-owner --no-acl --clean -v $DUMPDIR
+  pg_restore -d $LOCAL_URL -j 4 --disable-triggers --no-owner --no-acl --clean --if-exists -v $DUMPDIR
 
   if [ $? -ne 0 ]; then
     echo "Error: pg_restore failed."
