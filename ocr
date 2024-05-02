@@ -1,0 +1,31 @@
+#! /opt/homebrew/bin/bash
+
+# ocr <pdf_file> <psm> <dpi>
+
+readonly file=$1
+readonly psm=${2:-3}
+readonly extension=${file##*.}
+readonly file_wwithout_extension=$(basename -s ".${extension}" "$file")
+readonly dpi=${3:-800}
+
+echo 'Converting pdf to image...'
+pdftoppm -jpeg -r "$dpi" "$file" "${file_without_extension}_page"
+echo 'Done!'
+
+echo 'Converting these images back to pdf with OCR...'
+for img in ${file_without_extension}_page*.jpg; do
+    echo "Processing $img with OCR..."
+    tesseract "$img" "${img%.*}" --psm $psm pdf
+done
+echo 'Done!'
+
+echo 'Compiling the results...'
+gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -dPDFSETTINGS=/prepress -sOutputFile="${file_without_extension}_ocr.pdf" ${file_without_extension}_page*.pdf
+echo 'Done!'
+
+echo 'Cleaning up workfiles...'
+
+ls | grep "${file_without_extension}_page*" | xargs rm
+
+echo 'Done!'
+
