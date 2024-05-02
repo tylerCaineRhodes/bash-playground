@@ -25,6 +25,7 @@ packages=(
 	"tree"
   "ripgrep"
   "fd"
+  "gh"
 )
 
 brew update
