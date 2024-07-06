@@ -1,3 +1,4 @@
 #! /opt/homebrew/bin/bash
 
-ifconfig | grep "inet " | grep -v 127.0.0.1 | awk '{print $2}'
+# this will print the public ip address of the machine
+curl ifconfig.me
