@@ -1,0 +1,10 @@
+#! /opt/homebrew/bin/bash
+
+output=$(fzf)
+repomix --include $output
+
+cat repomix-output.txt | pbcopy
+rm repomix-output.txt
+
+echo "Copied to clipboard!"
+
