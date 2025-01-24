@@ -1,10 +1,12 @@
 #! /opt/homebrew/bin/bash
 
-output=$(fzf)
-repomix --include $output
+selected=$(fzf --multi)
+
+comma_separated=$(echo "$selected" | paste -sd "," -)
+
+repomix --include "$comma_separated"
 
 cat repomix-output.txt | pbcopy
 rm repomix-output.txt
 
 echo "Copied to clipboard!"
-
