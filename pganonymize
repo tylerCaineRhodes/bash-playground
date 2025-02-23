@@ -11,56 +11,48 @@ elif [ -z "$DUMPDIR" ]; then
   exit 1
 fi
 
-DB_NAME=$(echo $LOCAL_URL | sed -n 's/.*\/\([^?]*\).*/\1/p')
-echo "Database name: $DB_NAME"
+TEMP_DUMP="${DUMPDIR}/anonymized.sql"
 
-TEMP_DUMP="${DUMPDIR}/temp_for_anonymization.sql"
-echo "Creating temporary dump..."
-pg_dump -f "$TEMP_DUMP" "$LOCAL_URL"
+echo "Starting anonymization using pg-anonymizer..."
 
-if [ $? -ne 0 ]; then
-  echo "Error: Failed to create temporary dump."
-  exit 1
+# Create a temporary package.json if it doesn't exist
+if [ ! -f package.json ]; then
+    echo '{"private": true}' > package.json
 fi
 
-echo "Starting anonymization using Docker..."
+# Install pg-anonymizer locally
+npm install pg-anonymizer --no-package-lock
 
-docker run --rm -v "${TEMP_DUMP}:/dump.sql" \
-  registry.gitlab.com/dalibo/postgresql_anonymizer \
-  bash -c "
-    createdb $DB_NAME && \
-    psql $DB_NAME -c 'CREATE EXTENSION anon CASCADE' && \
-    psql $DB_NAME -c 'SELECT anon.init()' && \
-    psql $DB_NAME -f /dump.sql && \
-    psql $DB_NAME -c \"
-      SECURITY LABEL FOR anon ON COLUMN profiles.first_name
-      IS 'MASKED WITH FUNCTION anon.fake_first_name()';
+# Extract database name from URL
+DB_NAME=$(echo $LOCAL_URL | sed -n 's/.*\/\([^?]*\).*/\1/p')
 
-      SECURITY LABEL FOR anon ON COLUMN profiles.last_name
-      IS 'MASKED WITH FUNCTION anon.fake_last_name()';
-
-      SECURITY LABEL FOR anon ON COLUMN profiles.email
-      IS 'MASKED WITH FUNCTION anon.random_email()';
-
-      SELECT anon.anonymize_database();
-    \" && \
-    pg_dump $DB_NAME -f /dump.sql
-  "
+# Run pg-anonymizer from node_modules
+./node_modules/.bin/pg-anonymizer "$LOCAL_URL" -o "$TEMP_DUMP" \
+  --columns "first_name:faker.name.firstName,last_name:faker.name.lastName,email:faker.internet.email"
 
 if [ $? -ne 0 ]; then
   echo "Error: Anonymization failed."
-  rm "$TEMP_DUMP"
+  rm -f "$TEMP_DUMP"
+  rm -rf node_modules package.json # cleanup
   exit 1
 fi
 
 echo "Restoring anonymized data..."
-psql "$LOCAL_URL" -f "$TEMP_DUMP"
+# Drop and recreate database
+dropdb --if-exists "$DB_NAME"
+createdb "$DB_NAME"
+
+# Restore with clean (-c) flag
+psql -d "$DB_NAME" -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;" 
+psql -d "$DB_NAME" -f "$TEMP_DUMP"
 
 if [ $? -ne 0 ]; then
   echo "Error: Failed to restore anonymized data."
-  rm "$TEMP_DUMP"
+  rm -f "$TEMP_DUMP"
+  rm -rf node_modules package.json # cleanup
   exit 1
 fi
 
-rm "$TEMP_DUMP"
+rm -f "$TEMP_DUMP"
+rm -rf node_modules package.json # cleanup
 echo "Anonymization completed successfully!" 
