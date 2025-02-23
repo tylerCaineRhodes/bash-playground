@@ -1,58 +1,70 @@
 #! /opt/homebrew/bin/bash
 
+function cleanup_temp_file() {
+    local temp_file=$1
+    rm -f "$temp_file"
+}
+
+function reset_database() {
+    local db_name=$1
+
+    dropdb --if-exists "$db_name"
+    createdb "$db_name"
+    psql -d "$db_name" -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
+}
+
+function anonymize_database() {
+    local url=$1
+    local output_file=$2
+
+    echo "Starting anonymization using pg-anonymizer..."
+
+    npx pg-anonymizer "$url" -o "$output_file" \
+        --columns "first_name:faker.name.firstName,last_name:faker.name.lastName,email:faker.internet.email,username:faker.internet.userName"
+
+    if [ $? -ne 0 ]; then
+        cleanup_temp_file "$output_file"
+        echo "Error: Anonymization failed."
+        exit 1
+    fi
+}
+
+function restore_database() {
+    local db_name=$1
+    local dump_file=$2
+
+    echo "Restoring anonymized data..."
+
+    psql -d "$db_name" -f "$dump_file"
+
+    if [ $? -ne 0 ]; then
+        cleanup_temp_file "$dump_file"
+        echo "Error: Failed to restore anonymized data."
+        exit 1
+    fi
+}
+
+######## Main ##########
 readonly LOCAL_URL=$1
 readonly DUMPDIR=$2
+readonly TEMP_DUMP="${DUMPDIR}/anonymized.sql"
 
 if [ -z "$LOCAL_URL" ]; then
-  echo "Error: LOCAL_URL is required."
-  exit 1
-elif [ -z "$DUMPDIR" ]; then
-  echo "Error: DUMPDIR is required."
-  exit 1
+    echo "Error: LOCAL_URL is required."
+    exit 1
 fi
 
-TEMP_DUMP="${DUMPDIR}/anonymized.sql"
-
-echo "Starting anonymization using pg-anonymizer..."
-
-# Create a temporary package.json if it doesn't exist
-if [ ! -f package.json ]; then
-    echo '{"private": true}' > package.json
+if [ -z "$DUMPDIR" ]; then
+    echo "Error: DUMPDIR is required."
+    exit 1
 fi
 
-# Install pg-anonymizer locally
-npm install pg-anonymizer --no-package-lock
+DB_NAME=$(echo "$LOCAL_URL" | sed -n 's/.*\/\([^?]*\).*/\1/p')
 
-# Extract database name from URL
-DB_NAME=$(echo $LOCAL_URL | sed -n 's/.*\/\([^?]*\).*/\1/p')
+anonymize_database "$LOCAL_URL" "$TEMP_DUMP"
+reset_database "$DB_NAME"
+restore_database "$DB_NAME" "$TEMP_DUMP"
+cleanup_temp_file "$TEMP_DUMP"
 
-# Run pg-anonymizer from node_modules
-./node_modules/.bin/pg-anonymizer "$LOCAL_URL" -o "$TEMP_DUMP" \
-  --columns "first_name:faker.name.firstName,last_name:faker.name.lastName,email:faker.internet.email,username:faker.internet.userName"
-
-if [ $? -ne 0 ]; then
-  echo "Error: Anonymization failed."
-  rm -f "$TEMP_DUMP"
-  rm -rf node_modules package.json # cleanup
-  exit 1
-fi
-
-echo "Restoring anonymized data..."
-# Drop and recreate database
-dropdb --if-exists "$DB_NAME"
-createdb "$DB_NAME"
-
-# Restore with clean (-c) flag
-psql -d "$DB_NAME" -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;" 
-psql -d "$DB_NAME" -f "$TEMP_DUMP"
-
-if [ $? -ne 0 ]; then
-  echo "Error: Failed to restore anonymized data."
-  rm -f "$TEMP_DUMP"
-  rm -rf node_modules package.json # cleanup
-  exit 1
-fi
-
-rm -f "$TEMP_DUMP"
-rm -rf node_modules package.json # cleanup
 echo "Anonymization completed successfully!"
+######## Main ##########
