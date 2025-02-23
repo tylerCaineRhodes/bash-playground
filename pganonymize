@@ -1,78 +1,66 @@
 #! /opt/homebrew/bin/bash
 
 readonly LOCAL_URL=$1
+readonly DUMPDIR=$2
 
 if [ -z "$LOCAL_URL" ]; then
   echo "Error: LOCAL_URL is required."
   exit 1
-fi
-
-function setup_anonymizer() {
-  echo "Setting up postgresql-anonymizer extension..."
-  
-  psql "$LOCAL_URL" -c "
-    CREATE EXTENSION IF NOT EXISTS anon CASCADE;
-    SELECT anon.init();
-  "
-
-  if [ $? -ne 0 ]; then
-    echo "Error: Failed to initialize anonymizer extension."
-    return 1
-  fi
-}
-
-function anonymize_data() {
-  echo "Starting data anonymization..."
-
-  psql "$LOCAL_URL" -c "
-    -- Create masking rules
-    BEGIN;
-    
-    -- Define masking rules for the profiles table
-    SELECT anon.mask_init();
-    
-    UPDATE anon.maskrules SET 
-      masking_function = 'anon.fake_first_name()'
-    WHERE schema_name = 'public' 
-      AND table_name = 'profiles'
-      AND column_name = 'first_name';
-    
-    UPDATE anon.maskrules SET 
-      masking_function = 'anon.fake_last_name()'
-    WHERE schema_name = 'public' 
-      AND table_name = 'profiles'
-      AND column_name = 'last_name';
-    
-    UPDATE anon.maskrules SET 
-      masking_function = 'anon.random_email()'
-    WHERE schema_name = 'public' 
-      AND table_name = 'profiles'
-      AND column_name = 'email';
-    
-    -- Apply the masking
-    SELECT anon.anonymize_database();
-    
-    COMMIT;
-  "
-
-  if [ $? -ne 0 ]; then
-    echo "Error: Data anonymization failed."
-    return 1
-  else
-    echo "Data anonymization completed successfully!"
-  fi
-}
-
-######## Main ##########
-setup_anonymizer
-
-if [ $? -ne 0 ]; then
+elif [ -z "$DUMPDIR" ]; then
+  echo "Error: DUMPDIR is required."
   exit 1
 fi
 
-anonymize_data
+DB_NAME=$(echo $LOCAL_URL | sed -n 's/.*\/\([^?]*\).*/\1/p')
+echo "Database name: $DB_NAME"
+
+TEMP_DUMP="${DUMPDIR}/temp_for_anonymization.sql"
+echo "Creating temporary dump..."
+pg_dump -f "$TEMP_DUMP" "$LOCAL_URL"
 
 if [ $? -ne 0 ]; then
+  echo "Error: Failed to create temporary dump."
   exit 1
 fi
-######## Main ########## 
+
+echo "Starting anonymization using Docker..."
+
+docker run --rm -v "${TEMP_DUMP}:/dump.sql" \
+  registry.gitlab.com/dalibo/postgresql_anonymizer \
+  bash -c "
+    createdb $DB_NAME && \
+    psql $DB_NAME -c 'CREATE EXTENSION anon CASCADE' && \
+    psql $DB_NAME -c 'SELECT anon.init()' && \
+    psql $DB_NAME -f /dump.sql && \
+    psql $DB_NAME -c \"
+      SECURITY LABEL FOR anon ON COLUMN profiles.first_name
+      IS 'MASKED WITH FUNCTION anon.fake_first_name()';
+
+      SECURITY LABEL FOR anon ON COLUMN profiles.last_name
+      IS 'MASKED WITH FUNCTION anon.fake_last_name()';
+
+      SECURITY LABEL FOR anon ON COLUMN profiles.email
+      IS 'MASKED WITH FUNCTION anon.random_email()';
+
+      SELECT anon.anonymize_database();
+    \" && \
+    pg_dump $DB_NAME -f /dump.sql
+  "
+
+if [ $? -ne 0 ]; then
+  echo "Error: Anonymization failed."
+  rm "$TEMP_DUMP"
+  exit 1
+fi
+
+echo "Restoring anonymized data..."
+psql "$LOCAL_URL" -f "$TEMP_DUMP"
+
+if [ $? -ne 0 ]; then
+  echo "Error: Failed to restore anonymized data."
+  rm "$TEMP_DUMP"
+  exit 1
+fi
+
+rm "$TEMP_DUMP"
+echo "Anonymization completed successfully!" 
