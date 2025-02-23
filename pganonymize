@@ -1,0 +1,78 @@
+#! /opt/homebrew/bin/bash
+
+readonly LOCAL_URL=$1
+
+if [ -z "$LOCAL_URL" ]; then
+  echo "Error: LOCAL_URL is required."
+  exit 1
+fi
+
+function setup_anonymizer() {
+  echo "Setting up postgresql-anonymizer extension..."
+  
+  psql "$LOCAL_URL" -c "
+    CREATE EXTENSION IF NOT EXISTS anon CASCADE;
+    SELECT anon.init();
+  "
+
+  if [ $? -ne 0 ]; then
+    echo "Error: Failed to initialize anonymizer extension."
+    return 1
+  fi
+}
+
+function anonymize_data() {
+  echo "Starting data anonymization..."
+
+  psql "$LOCAL_URL" -c "
+    -- Create masking rules
+    BEGIN;
+    
+    -- Define masking rules for the profiles table
+    SELECT anon.mask_init();
+    
+    UPDATE anon.maskrules SET 
+      masking_function = 'anon.fake_first_name()'
+    WHERE schema_name = 'public' 
+      AND table_name = 'profiles'
+      AND column_name = 'first_name';
+    
+    UPDATE anon.maskrules SET 
+      masking_function = 'anon.fake_last_name()'
+    WHERE schema_name = 'public' 
+      AND table_name = 'profiles'
+      AND column_name = 'last_name';
+    
+    UPDATE anon.maskrules SET 
+      masking_function = 'anon.random_email()'
+    WHERE schema_name = 'public' 
+      AND table_name = 'profiles'
+      AND column_name = 'email';
+    
+    -- Apply the masking
+    SELECT anon.anonymize_database();
+    
+    COMMIT;
+  "
+
+  if [ $? -ne 0 ]; then
+    echo "Error: Data anonymization failed."
+    return 1
+  else
+    echo "Data anonymization completed successfully!"
+  fi
+}
+
+######## Main ##########
+setup_anonymizer
+
+if [ $? -ne 0 ]; then
+  exit 1
+fi
+
+anonymize_data
+
+if [ $? -ne 0 ]; then
+  exit 1
+fi
+######## Main ########## 
