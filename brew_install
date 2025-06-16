@@ -13,6 +13,7 @@ packages=(
 	"rubymine"
 	"yarn"
 	"cmake"
+	"fzf"
 	"shared-mime-info"
 	"vips"
 	"redis"
