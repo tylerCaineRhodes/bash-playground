@@ -1,0 +1,13 @@
+#! /opt/homebrew/bin/bash
+
+project_name=$(basename "$PWD")
+patch_path=~/."${project_name}_local_changes.patch"
+
+echo "Saving patch to: $patch_path"
+git diff > "$patch_path"
+
+if [[ $? -eq 0 ]]; then
+  echo "Patch saved successfully."
+else
+  echo "Failed to save patch."
+fi
