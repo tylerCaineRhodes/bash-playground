@@ -1,41 +1,50 @@
 #! /usr/bin/env bash
 
 packages=(
-	"tmux"
-	"nvm"
-	"rbenv"
-	"tldr"
-	"elixir"
-	"ffmpeg"
-	"imagemagick"
-	"heroku"
-	"neovim"
-	"rubymine"
-	"yarn"
-	"cmake"
-	"fzf"
-	"shared-mime-info"
-	"vips"
-	"redis"
-	"elasticsearch"
-	"chromedriver"
-	"openssl@3"
-	"bat"
-	"tmuxinator"
-	"watch"
-	"tree"
+  "tmux"
+  "nvm"
+  "rbenv"
+  "tlrc"
+  "elixir"
+  "ffmpeg"
+  "imagemagick"
+  "heroku"
+  "neovim"
+  "postgresql@15" # remember to link this for psql
+  "yarn"
+  "cmake"
+  "fzf"
+  "shared-mime-info"
+  "vips"
+  "redis"
+  "chromedriver"
+  "openssl@3"
+  "bat"
+  "tmuxinator"
+  "watch"
+  "tree"
   "ripgrep"
   "fd"
   "gh"
+  "atuin"
+  "sl"
+  "bash"
+  "git-lfs"
+  "ollama"
+  "oterm"
+  "rbspy"
+  "claude-code"
+  "git-mob"
+  "hammerspoon"
 )
 
 brew update
 
 for pkg in "${packages[@]}"; do
-	if brew list -1 | grep -q "^${pkg}\$"; then
-		echo "Package '$pkg' is already installed"
-	else
-		echo "Installing package '$pkg'"
-		brew install $pkg
-	fi
+  if brew list -1 | grep -q "^${pkg}\$"; then
+    echo "Package '$pkg' is already installed"
+  else
+    echo "Installing package '$pkg'"
+    brew install $pkg
+  fi
 done
