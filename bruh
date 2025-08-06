@@ -1,0 +1,9 @@
+#! /opt/homebrew/bin/bash
+
+branch=$(git branch --format="%(refname:short)" | fzf)
+
+if [[ -n "$branch" ]]; then
+  git switch "$branch"
+else
+  echo "No branch selected. Exiting."
+fi
