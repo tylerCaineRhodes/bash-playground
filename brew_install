@@ -36,6 +36,7 @@ packages=(
   "claude-code"
   "git-mob"
   "hammerspoon"
+  "stow"
 )
 
 brew update
