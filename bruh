@@ -1,6 +1,6 @@
 #! /opt/homebrew/bin/bash
 
-branch=$(git branch --format="%(refname:short)" | fzf)
+branch=$(git branch --format="%(refname:short)" --sort=-committerdate | fzf)
 
 if [[ -n "$branch" ]]; then
   git switch "$branch"
