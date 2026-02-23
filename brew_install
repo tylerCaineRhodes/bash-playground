@@ -37,6 +37,7 @@ packages=(
   "git-mob"
   "hammerspoon"
   "stow"
+  "lazygit"
 )
 
 brew update
