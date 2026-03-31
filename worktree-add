@@ -1,0 +1,6 @@
+#! /opt/homebrew/bin/bash
+
+read -p 'Branch name: ' branchname
+dir=${branchname//\//-}
+
+git worktree add ".worktrees/$dir" "$branchname" 2>/dev/null || git worktree add -b "$branchname" ".worktrees/$dir"
