@@ -1,8 +1,56 @@
-#! /opt/homebrew/bin/bash
+#!/opt/homebrew/bin/bash
+set -euo pipefail
 
-read -p 'Branch name: ' branchname
-dir=${branchname//\//-}
+BRANCH="${1:-}"
+[[ -z "$BRANCH" ]] && read -p 'Branch name: ' BRANCH
+[[ -z "$BRANCH" ]] && echo "ERROR: Branch name required." && exit 1
 
-git worktree add ".worktrees/$dir" "$branchname" 2>/dev/null || git worktree add -b "$branchname" ".worktrees/$dir"
+DIR="${BRANCH//\//-}"
+WT_DIR=".worktrees/$DIR"
+CALLER_HEAD="$(git rev-parse HEAD)"
 
-tmux new-session -s $branchname -c ".worktrees/$dir" -d
+MAIN_ROOT="$(git rev-parse --show-toplevel)"
+COMMON_DIR="$(git rev-parse --path-format=absolute --git-common-dir)"
+
+[[ "$COMMON_DIR" != "$(git rev-parse --path-format=absolute --git-dir)" ]] && MAIN_ROOT="$(dirname "$COMMON_DIR")"
+cd "$MAIN_ROOT"
+
+if [[ -d "$WT_DIR" ]]; then
+  if git -C "$WT_DIR" diff --quiet 2>/dev/null \
+     && git -C "$WT_DIR" diff --cached --quiet 2>/dev/null \
+     && [[ -z "$(git -C "$WT_DIR" ls-files --others --exclude-standard 2>/dev/null)" ]]; then
+    git worktree remove "$WT_DIR"
+  else
+    echo "ERROR: ${WT_DIR} exists with uncommitted changes." && exit 1
+  fi
+fi
+
+if git worktree list --porcelain 2>/dev/null | grep -q "^branch refs/heads/${BRANCH}$"; then
+  echo "ERROR: Branch '${BRANCH}' is already checked out in another worktree." && exit 1
+fi
+
+if git show-ref --verify --quiet "refs/heads/${BRANCH}"; then
+  git worktree add "$WT_DIR" "$BRANCH"
+elif git show-ref --verify --quiet "refs/remotes/origin/${BRANCH}"; then
+  git worktree add -b "$BRANCH" "$WT_DIR" "origin/${BRANCH}"
+else
+  git worktree add -b "$BRANCH" "$WT_DIR" "$CALLER_HEAD"
+fi
+
+if [[ -f ".worktreeinclude" ]]; then
+  while IFS= read -r pattern; do
+    [[ -z "$pattern" || "$pattern" == \#* ]] && continue
+    for file in $pattern; do
+      [[ -e "$file" ]] || continue
+      mkdir -p "${WT_DIR}/$(dirname "$file")"
+      cp "$file" "${WT_DIR}/${file}"
+    done
+  done < ".worktreeinclude"
+fi
+
+WT_ABS="${MAIN_ROOT}/${WT_DIR}"
+if command -v tmux &>/dev/null && ! tmux has-session -t "$BRANCH" 2>/dev/null; then
+  tmux new-session -d -s "$BRANCH" -c "$WT_ABS"
+fi
+
+echo "Worktree ready: ${WT_ABS} (branch: ${BRANCH})"
