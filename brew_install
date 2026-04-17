@@ -41,6 +41,7 @@ packages=(
   "pyenv"
   "tree-sitter"
   "tree-sitter-cli"
+  "curl"
 )
 
 brew update
