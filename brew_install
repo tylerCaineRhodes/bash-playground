@@ -38,6 +38,9 @@ packages=(
   "hammerspoon"
   "stow"
   "lazygit"
+  "pyenv"
+  "tree-sitter"
+  "tree-sitter-cli"
 )
 
 brew update
