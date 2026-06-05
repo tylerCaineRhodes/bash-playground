@@ -1,0 +1,5 @@
+#! /opt/homebrew/bin/bash
+
+bat ~/.claude/settings.json \
+  | jq -r ".spinnerVerbs.verbs[$(( RANDOM % $(bat ~/.claude/settings.json | jq '.spinnerVerbs.verbs | length') ))]"
+
