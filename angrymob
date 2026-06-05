@@ -1,0 +1,3 @@
+#! /opt/homebrew/bin/bash
+
+git mob $(git mob -l | fzf --multi | awk -F',' '{ print $1 }')
