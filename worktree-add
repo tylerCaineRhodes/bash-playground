@@ -5,17 +5,23 @@ BRANCH="${1:-}"
 [[ -z "$BRANCH" ]] && read -p 'Branch name: ' BRANCH
 [[ -z "$BRANCH" ]] && echo "ERROR: Branch name required." && exit 1
 
-DIR="${BRANCH//\//-}"
-WT_DIR=".worktrees/$DIR"
 CALLER_HEAD="$(git rev-parse HEAD)"
-
 MAIN_ROOT="$(git rev-parse --show-toplevel)"
 COMMON_DIR="$(git rev-parse --path-format=absolute --git-common-dir)"
-
 [[ "$COMMON_DIR" != "$(git rev-parse --path-format=absolute --git-dir)" ]] && MAIN_ROOT="$(dirname "$COMMON_DIR")"
+
+REPO_NAME="$(basename "$MAIN_ROOT")"
+PARENT_DIR="$(dirname "$MAIN_ROOT")"
+BRANCH_SLUG="${BRANCH//\//-}"
+WT_DIR="${PARENT_DIR}/${REPO_NAME}-${BRANCH_SLUG}"
+
 cd "$MAIN_ROOT"
 
-if [[ -d "$WT_DIR" ]]; then
+if [[ -e "$WT_DIR" ]]; then
+  WT_ABS="$(cd "$WT_DIR" 2>/dev/null && pwd -P)" || WT_ABS=""
+  if [[ -z "$WT_ABS" ]] || ! git worktree list --porcelain | awk '/^worktree / { print $2 }' | grep -qxF "$WT_ABS"; then
+    echo "ERROR: ${WT_DIR} exists but is not a registered worktree of this repo. Refusing to overwrite." && exit 1
+  fi
   if git -C "$WT_DIR" diff --quiet 2>/dev/null \
      && git -C "$WT_DIR" diff --cached --quiet 2>/dev/null \
      && [[ -z "$(git -C "$WT_DIR" ls-files --others --exclude-standard 2>/dev/null)" ]]; then
@@ -48,9 +54,8 @@ if [[ -f ".worktreeinclude" ]]; then
   done < ".worktreeinclude"
 fi
 
-WT_ABS="${MAIN_ROOT}/${WT_DIR}"
 if command -v tmux &>/dev/null && ! tmux has-session -t "$BRANCH" 2>/dev/null; then
-  tmux new-session -d -s "$BRANCH" -c "$WT_ABS"
+  tmux new-session -d -s "$BRANCH" -c "$WT_DIR"
 fi
 
-echo "Worktree ready: ${WT_ABS} (branch: ${BRANCH})"
+echo "Worktree ready: ${WT_DIR} (branch: ${BRANCH})"
