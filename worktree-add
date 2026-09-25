@@ -46,6 +46,7 @@ fi
 if [[ -f ".worktreeinclude" ]]; then
   while IFS= read -r pattern; do
     [[ -z "$pattern" || "$pattern" == \#* ]] && continue
+    pattern="${pattern#/}"
     for file in $pattern; do
       [[ -e "$file" ]] || continue
       mkdir -p "${WT_DIR}/$(dirname "$file")"
@@ -54,8 +55,18 @@ if [[ -f ".worktreeinclude" ]]; then
   done < ".worktreeinclude"
 fi
 
+DB_ENV=()
+if [[ -f "${WT_DIR}/config/database.yml" ]] && grep -q 'DB_NAME' "${WT_DIR}/config/database.yml"; then
+  DB_NAME="$(printf '%s' "${REPO_NAME}_development_${BRANCH_SLUG}" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9_' '_')"
+  ENV_FILE="${WT_DIR}/.env"
+  { [[ -f "$ENV_FILE" ]] && grep -v '^DB_NAME=' "$ENV_FILE" || true; echo "DB_NAME=${DB_NAME}"; } > "${ENV_FILE}.new"
+  mv "${ENV_FILE}.new" "$ENV_FILE"
+  DB_ENV=(-e "DB_NAME=${DB_NAME}")
+  echo "Set DB_NAME=${DB_NAME} in ${ENV_FILE} and the tmux session"
+fi
+
 if command -v tmux &>/dev/null && ! tmux has-session -t "$BRANCH" 2>/dev/null; then
-  tmux new-session -d -s "$BRANCH" -c "$WT_DIR"
+  tmux new-session -d -s "$BRANCH" -c "$WT_DIR" "${DB_ENV[@]}"
 fi
 
 echo "Worktree ready: ${WT_DIR} (branch: ${BRANCH})"
